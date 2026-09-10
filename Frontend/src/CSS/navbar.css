@@ -1,0 +1,52 @@
+.header{
+    position: fixed;
+    border: 2px solid #D9D2C7;
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding: 20px 10%;
+    background-color: #FFF9F2;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    /* z-index: 100; */
+}
+
+.logo{
+    font-size: 32px;
+    color: #5279A8;
+    font-weight: 600;
+}
+
+.navbar{
+    display: flex;
+    gap: 30px;
+}
+
+.navbar a{
+    font-size: 20px;
+    color: #0F172A;
+    font-weight: 500;
+}
+
+#logout{
+    background-color: #ff4d4d;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+#logout:hover{
+    background-color: #e63939;
+}
+
+#username{
+    color: #333;
+    font-size: 18px;
+    font-weight: 600;
+    padding: 8px 12px;
+    margin-right: 10px;
+}

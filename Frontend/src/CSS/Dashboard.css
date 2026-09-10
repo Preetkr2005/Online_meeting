@@ -1,0 +1,63 @@
+.content {
+  min-height: calc(100vh - 90px);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 12%;
+  background-color:  #E8EDF5;
+  height: 100vh;
+}
+
+.left_content {
+  display: flex;
+  flex-direction: column;
+  gap: 100px;
+}
+
+.meeting {
+  display: flex;
+  gap: 150px;
+}
+
+#new_meeting,
+#Join_meeting {
+  width: 190px;
+  height: 110px;
+  border: 1px solid #0F172A;
+  border-radius: 18px;
+  font-weight: 500;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  cursor: pointer;
+}
+
+.meeting_card {
+  width: 400px;
+  padding: 30px;
+  border: 1px solid #D9D2C7;
+  border-radius: 15px;
+  background: #FFFDF9;
+  text-align: center;
+  color: #334155;;
+}
+
+#new_meeting{
+    background-color:#9BB9E0;
+    color: #334155;
+}
+
+#new_meeting:hover{
+    background-color:#8FB5F2;
+}
+
+#Join_meeting{
+    background-color: #9BB9E0;
+    color: #334155;
+}
+
+#Join_meeting:hover{
+    background-color: #8FB5F2;
+}
