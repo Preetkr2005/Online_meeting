@@ -83,6 +83,13 @@ io.on("connection", (socket) => {
 
   })
 
+  socket.on("join_meeting", (username) => {
+    console.log(username, "joined the meeting")
+
+    io.emit("user_joined", username)
+
+  })
+
 })
 
 
@@ -120,16 +127,7 @@ server.listen(port, () => {
   
 //   console.log("User connected: ", socket.id)
 
-//   // User joins a room 
-//   socket.on("join_meeting", (data) => {
 
-//     const {roomId, username} = data
-
-//     socket.join(roomId);
-
-//     console.log(`${socket.id} joined meeting ${meetingId}`)
-
-//   })
 
 // //   //Receive message
 

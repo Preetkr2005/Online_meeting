@@ -4,23 +4,26 @@ import "../CSS/Join_meeting.css"
 import Navbar from "../Components/navbar"
 import image from "../assets/join_meeting.png"
 import axios from "axios"
+import socket from '../socket'
 
 
 function Join_meeting() {
 
   const [meetingCode, setMeetingCode] = useState("")
   const navigate = useNavigate()
+  const username = localStorage.getItem("username")
 
   const handleJoinMeeting = async (e) => {
 
     e.preventDefault();
-    
+
     const response = await axios.post("http://localhost:3000/api/Join_meeting",{
       meetingCode: meetingCode
     })
 
     if(response.data.status === "exists"){
       navigate(`/meeting/${meetingCode}`)
+      socket.emit("join_meeting",username)
     }
     else{
       alert("meeting not exists")

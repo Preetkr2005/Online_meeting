@@ -8,12 +8,25 @@ import socket from "../socket"
 function Meeting() {  
 
   const { meetingCode } = useParams()
+  const username = localStorage.getItem("username")
+
 
   const [state, setState] = useState(false)
   const [messages, setMessages] = useState([])
   const [inputMessage, setInputMessage] = useState("")
 
+    const data = {
+    username: username,
+    message: inputMessage
+  }
+
   useEffect(() => {
+
+  const handleUserJoined = (username) => {
+    alert(username + " joined the meeting")
+  }
+
+  socket.on("user_joined",handleUserJoined)
     
   const handleReceiveMessage = (data) => {
     setMessages((messages) => {
@@ -31,7 +44,7 @@ function Meeting() {
 
   const handleMessage = () => {
 
-    socket.emit("send_message", inputMessage)
+    socket.emit("send_message", data)
 
   }
 
@@ -84,10 +97,11 @@ function Meeting() {
 
         <div className="chat_message">
           {messages.length > 0 && (
-              messages.map(function(message, index){
+              messages.map(function(data, index){
                 return(
                   <div className="message_sent" key={index}>
-                    <p>{message}</p>
+                    <span>{data.username}</span>
+                    <p id="message">{data.message}</p>
                   </div>
                 )
               })

@@ -112,6 +112,8 @@
     flex: 1;
     padding: 1rem;
     width: 100%;
+    box-sizing: border-box;
+    overflow-y: auto;
 }
 
 .chat_input{
@@ -133,13 +135,18 @@
 }
 
 .message_sent{
-    display: flex;
-    justify-content: flex-end;
+    width: fit-content;
+    max-width: 70%;
+
+    margin-left: auto;
     margin-top: 10px;
-    padding: 14px;
-    margin-left: 15rem;
+
+    padding: 8px 12px;
+
     background-color: #4f46e5;
-    border-radius: 10px;
+    border-radius: 12px;
+
+    color: white;
 }
 
 .message_received{
@@ -156,4 +163,17 @@
     top: 20px;
     right: 20px;
     cursor: pointer;
+}
+
+span {
+    display: block;
+    font-size: 12px;
+    font-weight: bold;
+    margin-bottom: 3px;
+    color: black;
+}
+
+#message {
+    margin: 0;
+    font-size: 16px;
 }
