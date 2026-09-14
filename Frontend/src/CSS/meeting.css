@@ -114,6 +114,7 @@
     width: 100%;
     box-sizing: border-box;
     overflow-y: auto;
+
 }
 
 .chat_input{
@@ -134,35 +135,25 @@
     border-radius: 10px;
 }
 
-.message_sent{
+.message_sent,
+.message_received {
     width: fit-content;
     max-width: 70%;
-
-    margin-left: auto;
-    margin-top: 10px;
-
     padding: 8px 12px;
 
     background-color: #4f46e5;
     border-radius: 12px;
 
     color: white;
+    margin-top: 10px;
 }
 
-.message_received{
-    display: flex;
-    justify-content: flex-start;
-    padding: 14px;
-    border-radius: 10px;
-    background-color: #4f46e5;
-    margin-right: 15rem;
+.message_sent {
+    margin-left: auto;
 }
 
-.close_icon{
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    cursor: pointer;
+.message_received {
+    margin-right: auto;
 }
 
 span {
@@ -177,3 +168,11 @@ span {
     margin: 0;
     font-size: 16px;
 }
+
+.close_icon{
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    cursor: pointer;
+}
+

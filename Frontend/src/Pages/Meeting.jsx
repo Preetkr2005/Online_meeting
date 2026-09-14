@@ -4,6 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faVideo, faMicrophoneLines,faWindowRestore, faMessage, faSquarePhone, faX } from '@fortawesome/free-solid-svg-icons'
 import { useState, useEffect } from "react"
 import socket from "../socket"
+import Toast from "../Components/toast"
 
 function Meeting() {  
 
@@ -14,6 +15,8 @@ function Meeting() {
   const [state, setState] = useState(false)
   const [messages, setMessages] = useState([])
   const [inputMessage, setInputMessage] = useState("")
+  const [showToast, setshowToast] = useState(false)
+  const [toastUsername, setToastUsername] = useState("")
 
     const data = {
     username: username,
@@ -23,7 +26,11 @@ function Meeting() {
   useEffect(() => {
 
   const handleUserJoined = (username) => {
-    alert(username + " joined the meeting")
+    setToastUsername(username)
+    setshowToast(true)
+    setTimeout(() => {
+      setshowToast(false)
+    }, 2000)
   }
 
   socket.on("user_joined",handleUserJoined)
@@ -70,6 +77,8 @@ function Meeting() {
         <p>Meeting ID: {meetingCode}</p>
       </div>
 
+        {showToast && <Toast username={toastUsername}/>}
+
       <div className="video">
         <div id="video1">
           video appear here!
@@ -99,18 +108,17 @@ function Meeting() {
           {messages.length > 0 && (
               messages.map(function(data, index){
                 return(
-                  <div className="message_sent" key={index}>
+                  <div className={
+                    data.username === username
+                    ?"message_sent"
+                    :"message_received"
+                  } key={index}>
                     <span>{data.username}</span>
                     <p id="message">{data.message}</p>
                   </div>
                 )
               })
           )}
-
-          {/* <div className="message_received">
-            <p>hello!</p>
-          </div> */}
-
         </div>
 
         <div className="chat_input">
