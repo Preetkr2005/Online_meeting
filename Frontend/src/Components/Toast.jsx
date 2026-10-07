@@ -1,10 +1,10 @@
 import {useState} from "react"
 import "../CSS/Toast.css"
 
-function Toast({username}) {
+function Toast({username, message}) {
   return (
     <div className="Toast">
-        {username} Joined the meeting
+        {username} {message}
     </div>
   )
 }

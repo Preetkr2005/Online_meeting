@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom"
+import { useParams, useNavigate } from "react-router-dom"
 import "../CSS/meeting.css"
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faVideo, faMicrophoneLines,faWindowRestore, faMessage, faSquarePhone, faX } from '@fortawesome/free-solid-svg-icons'
@@ -10,30 +10,35 @@ function Meeting() {
 
   const { meetingCode } = useParams()
   const username = localStorage.getItem("username")
+  const navigate = useNavigate()
 
 
   const [state, setState] = useState(false)
   const [messages, setMessages] = useState([])
   const [inputMessage, setInputMessage] = useState("")
+
   const [showToast, setshowToast] = useState(false)
   const [toastUsername, setToastUsername] = useState("")
+  const [toastMessage, setToastMessage] = useState("")
 
-    const data = {
+  const data = {
     username: username,
     message: inputMessage
   }
 
+  // this is user_joined
   useEffect(() => {
 
   const handleUserJoined = (username) => {
+
     setToastUsername(username)
+    setToastMessage("joined meeting")
     setshowToast(true)
+
     setTimeout(() => {
       setshowToast(false)
     }, 2000)
   }
-
-  socket.on("user_joined",handleUserJoined)
     
   const handleReceiveMessage = (data) => {
     setMessages((messages) => {
@@ -41,17 +46,48 @@ function Meeting() {
     })
   };
 
+  socket.on("user_joined",handleUserJoined)
   socket.on("receive_message", handleReceiveMessage);
+
+  socket.emit("join_meeting", {
+    username,
+    meetingCode
+  })
 
   return () => {
     socket.off("receive_message", handleReceiveMessage);
+    socket.off("user_joined", handleUserJoined)
   };
+
+  }, [meetingCode, username])
+
+
+  //this is for user_left
+  useEffect(() => {
+
+    const handleUserLeft = (username) => {
+      console.log(username, "left the meeting")
+
+      setToastUsername(username)
+      setToastMessage("left meeting")
+      setshowToast(true)
+      setTimeout(() => {
+        setshowToast(false)
+      }, 2000)
+
+    }
+
+    socket.on("user_left", handleUserLeft)
+
+    return () => {
+      socket.off("user_left", handleUserLeft)
+    }
 
   }, [])
 
   const handleMessage = () => {
 
-    socket.emit("send_message", data)
+    socket.emit("send_message", {...data, meetingCode})
 
   }
 
@@ -68,6 +104,17 @@ function Meeting() {
 
   }
 
+  const LeaveRoom = () => {
+
+    socket.emit("leave_meeting", {
+      username,
+      meetingCode
+    });
+
+    navigate("/dashboard")
+
+  }
+
 
   return (
     <div className="meeting_container">
@@ -77,7 +124,7 @@ function Meeting() {
         <p>Meeting ID: {meetingCode}</p>
       </div>
 
-        {showToast && <Toast username={toastUsername}/>}
+        {showToast && <Toast username={toastUsername} message={toastMessage}/>}
 
       <div className="video">
         <div id="video1">
@@ -93,7 +140,7 @@ function Meeting() {
         <FontAwesomeIcon id="video" icon={faVideo} />
         <FontAwesomeIcon id="screen-share" icon={faWindowRestore} />
         <FontAwesomeIcon onClick={handlechat} id="chat" icon={faMessage} />
-        <FontAwesomeIcon id="end" icon={faSquarePhone} />
+        <FontAwesomeIcon onClick={LeaveRoom} id="end" icon={faSquarePhone} />
       </div>
       </div>
 

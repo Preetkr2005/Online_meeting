@@ -18,12 +18,12 @@ function Join_meeting() {
     e.preventDefault();
 
     const response = await axios.post("http://localhost:3000/api/Join_meeting",{
-      meetingCode: meetingCode
+      meetingCode: meetingCode,
     })
 
     if(response.data.status === "exists"){
       navigate(`/meeting/${meetingCode}`)
-      socket.emit("join_meeting",username)
+      socket.emit("join_meeting",({username, meetingCode}))
     }
     else{
       alert("meeting not exists")
