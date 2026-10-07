@@ -79,14 +79,32 @@ io.on("connection", (socket) => {
 
   socket.on("send_message", (data) => {
 
-    io.emit("receive_message", data)
+    const {meetingCode} = data
+
+    io.to(meetingCode).emit("receive_message", data)
 
   })
 
-  socket.on("join_meeting", (username) => {
+  socket.on("join_meeting", ({username, meetingCode}) => {
     console.log(username, "joined the meeting")
+    socket.join(meetingCode)
 
-    io.emit("user_joined", username)
+    // console.log(username, "joined room:", meetingCode);
+    // console.log(io.sockets.adapter.rooms.get(meetingCode));
+
+    socket.to(meetingCode).emit("user_joined", username)
+
+  })
+
+  socket.on("leave_meeting", ({username, meetingCode}) => {
+
+    socket.leave(meetingCode)
+
+    console.log(username, "left the meeting:", meetingCode)
+
+    console.log(io.sockets.adapter.rooms.get(meetingCode));
+
+    io.to(meetingCode).emit("user_left",username)
 
   })
 
@@ -101,53 +119,6 @@ server.listen(port, () => {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// socket Io connection
-// io.on("connection", (socket) => {
-  
-//   console.log("User connected: ", socket.id)
-
-
-
-// //   //Receive message
-
-//     socket.on("send_message", (data) => {
-
-//       const {roomId, username, message} = data
-
-//         console.log("Room:", roomId);
-//         console.log("Username:", username);
-//         console.log("Message:", message);
-
-//       // send only to this room
-//       io.to(roomId).emit("receive_message", {
-        
-//         username: username,
-//         message: message
-
-//       })
-
-//     })
 
 //   // User disconnect 
 //   socket.on("disconnect", () => {
