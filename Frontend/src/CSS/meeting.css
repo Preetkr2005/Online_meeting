@@ -50,6 +50,13 @@
     background-color: #1B1F2A;
 }
 
+#video1 video{
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 16px;
+}
+
 /* Bottom controls */
 .buttons {
     display: flex;

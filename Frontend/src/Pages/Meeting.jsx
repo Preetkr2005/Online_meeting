@@ -1,8 +1,8 @@
 import { useParams, useNavigate } from "react-router-dom"
 import "../CSS/meeting.css"
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faVideo, faMicrophoneLines,faWindowRestore, faMessage, faSquarePhone, faX } from '@fortawesome/free-solid-svg-icons'
-import { useState, useEffect } from "react"
+import { faVideo, faMicrophoneLines,faWindowRestore, faMessage, faSquarePhone, faX, faMicrophoneLinesSlash, faVideoSlash } from '@fortawesome/free-solid-svg-icons'
+import { useState, useEffect, useRef } from "react"
 import socket from "../socket"
 import Toast from "../Components/toast"
 
@@ -11,6 +11,8 @@ function Meeting() {
   const { meetingCode } = useParams()
   const username = localStorage.getItem("username")
   const navigate = useNavigate()
+  const videoref = useRef(null)
+  const streamRef = useRef(null)
 
 
   const [state, setState] = useState(false)
@@ -20,6 +22,9 @@ function Meeting() {
   const [showToast, setshowToast] = useState(false)
   const [toastUsername, setToastUsername] = useState("")
   const [toastMessage, setToastMessage] = useState("")
+
+  const [Mic, setMic] = useState(true)
+  const [Camera, setCamera] = useState(true)
 
   const data = {
     username: username,
@@ -85,6 +90,28 @@ function Meeting() {
 
   }, [])
 
+  // Creating a local video preview
+  useEffect(() => {
+
+    const getCamera = async () => {
+
+      const stream = await navigator.mediaDevices.getUserMedia({
+
+        video: true
+
+      })
+
+      streamRef.current = stream;
+
+      videoref.current.srcObject = stream;
+
+    };
+    
+    getCamera()
+
+
+  }, [])
+
   const handleMessage = () => {
 
     socket.emit("send_message", {...data, meetingCode})
@@ -94,7 +121,7 @@ function Meeting() {
 
   const handlechat = () => {
 
-    setState(true)
+    setState(!state)
 
   }
 
@@ -115,6 +142,23 @@ function Meeting() {
 
   }
 
+  const handleMic = () => {
+    setMic(!Mic)
+  }
+
+  const handleCamera = () => {
+    const stream = streamRef.current
+
+    if(!stream) return
+
+    const videoTrack = stream.getVideoTracks()[0]
+
+    videoTrack.enabled = !videoTrack.enabled;
+
+    setCamera(videoTrack.enabled);
+
+   }
+
 
   return (
     <div className="meeting_container">
@@ -128,7 +172,7 @@ function Meeting() {
 
       <div className="video">
         <div id="video1">
-          video appear here!
+          <video ref={videoref} autoPlay playsInline/>
         </div>
         <div id="video2">
           video appear here
@@ -136,10 +180,15 @@ function Meeting() {
       </div>
 
       <div className="buttons">
-        <FontAwesomeIcon id="mic" icon={faMicrophoneLines} />
-        <FontAwesomeIcon id="video" icon={faVideo} />
+
+        {Mic ? <FontAwesomeIcon id="mic" onClick={handleMic} icon={faMicrophoneLines} /> : <FontAwesomeIcon id="mic" onClick={handleMic} icon={faMicrophoneLinesSlash} />}
+
+        {Camera ? <FontAwesomeIcon id="video" onClick={handleCamera} icon={faVideo} /> : <FontAwesomeIcon id="video" onClick={handleCamera} icon={faVideoSlash} />}
+
         <FontAwesomeIcon id="screen-share" icon={faWindowRestore} />
+
         <FontAwesomeIcon onClick={handlechat} id="chat" icon={faMessage} />
+
         <FontAwesomeIcon onClick={LeaveRoom} id="end" icon={faSquarePhone} />
       </div>
       </div>
