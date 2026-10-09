@@ -11,6 +11,7 @@ function Meeting() {
   const { meetingCode } = useParams()
   const username = localStorage.getItem("username")
   const navigate = useNavigate()
+  
   const videoref = useRef(null)
   const streamRef = useRef(null)
 
@@ -97,7 +98,8 @@ function Meeting() {
 
       const stream = await navigator.mediaDevices.getUserMedia({
 
-        video: true
+        video: true,
+        audio: true
 
       })
 
@@ -143,7 +145,19 @@ function Meeting() {
   }
 
   const handleMic = () => {
-    setMic(!Mic)
+    
+    const stream = streamRef.current
+
+    if(!stream) return
+
+    const audioTrack = stream.getAudioTracks()[0]
+
+    if(!audioTrack) return
+
+    audioTrack.enabled = !audioTrack.enabled
+
+    setMic(audioTrack.enabled)
+
   }
 
   const handleCamera = () => {
