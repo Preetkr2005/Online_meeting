@@ -14,6 +14,7 @@ function Meeting() {
   
   const videoref = useRef(null)
   const streamRef = useRef(null)
+  const peerconnectionRef = useRef(null)
 
 
   const [state, setState] = useState(false)
@@ -35,7 +36,7 @@ function Meeting() {
   // this is user_joined
   useEffect(() => {
 
-  const handleUserJoined = (username) => {
+  const handleUserJoined = ({username, socketId}) => {
 
     setToastUsername(username)
     setToastMessage("joined meeting")
@@ -44,6 +45,9 @@ function Meeting() {
     setTimeout(() => {
       setshowToast(false)
     }, 2000)
+
+    // New rtc logic where i get the meeting code
+    createOffer(socketId)
   }
     
   const handleReceiveMessage = (data) => {
@@ -91,6 +95,24 @@ function Meeting() {
 
   }, [])
 
+  // connect peer connection 
+  useEffect(() => {
+
+    const createPeerConnection = () => {
+      const pc = new RTCPeerConnection({
+        iceServers: [
+          {
+            urls: "stun:stun.l.google.com:19302",
+          }
+        ]
+      })
+      peerconnectionRef.current = pc
+    }
+
+    createPeerConnection()
+
+  }, [])
+
   // Creating a local video preview
   useEffect(() => {
 
@@ -107,12 +129,101 @@ function Meeting() {
 
       videoref.current.srcObject = stream;
 
+      // Add local tracks to the peer connection
+      stream.getTracks().forEach((track) => {
+        peerconnectionRef.current.addTrack(track, stream);
+      });
+
     };
     
     getCamera()
 
 
   }, [])
+
+  // create signaling offer and send the offer
+  const createOffer = async (targetSoketId) => {
+
+    console.log("1. createoffer called", targetSoketId)
+
+    const pc = peerconnectionRef.current
+
+    if(!pc || !targetSoketId) {
+      console.log("missing peer connection or target socket")
+    return;
+    }
+
+    try{
+
+    const offer = await pc.createOffer()
+    console.log("2. offer created")
+
+    await pc.setLocalDescription(offer)
+    console.log("3. local description set")
+
+    const localOffer = pc.localDescription.toJSON()
+    console.log("4. local offer prepared", localOffer)
+
+    socket.emit("offer",{
+      to: targetSoketId,
+      offer: pc.setLocalDescription,
+      meetingCode
+    })
+    
+    console.log("5. offer emitted")
+
+  }
+  catch(error){
+    console.log("webRtc offer error", error)
+  }
+};
+
+useEffect(() => {
+
+  const handleReceiveOffer = async ({ offer, from }) => {
+
+    const pc = peerconnectionRef.current;
+
+    if (!pc) {
+      console.log("Peer connection not ready");
+      return;
+    }
+
+    try {
+      // 1. Receive User A's offer
+      await pc.setRemoteDescription(
+        new RTCSessionDescription(offer)
+      );
+
+      console.log("Offer received from:", from);
+
+      // 2. Create an answer
+      const answer = await pc.createAnswer();
+
+      // 3. Set the answer as the local description
+      await pc.setLocalDescription(answer);
+
+      // 4. Send the answer back to User A
+      socket.emit("answer", {
+        to: from,
+        answer: pc.localDescription,
+        meetingCode
+      });
+
+      console.log("Answer sent to User A");
+
+    } catch (error) {
+      console.error("Error handling offer:", error);
+    }
+  };
+
+  socket.on("offer", handleReceiveOffer);
+
+  return () => {
+    socket.off("offer", handleReceiveOffer);
+  };
+
+}, [meetingCode]);
 
   const handleMessage = () => {
 
@@ -204,6 +315,9 @@ function Meeting() {
         <FontAwesomeIcon onClick={handlechat} id="chat" icon={faMessage} />
 
         <FontAwesomeIcon onClick={LeaveRoom} id="end" icon={faSquarePhone} />
+
+        <button onClick={() => createOffer("User_B_SOCKET _ID")}>create offer</button>
+
       </div>
       </div>
 
