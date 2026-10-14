@@ -96,6 +96,15 @@ io.on("connection", (socket) => {
 
   })
 
+  // forward the offer to the user B
+  socket.on("offer", ({to, offer, meetingCode}) => {
+    io.to(to).emit("offer", {
+      offer,
+      from: socket.id,
+      meetingCode
+    })
+  })
+
   socket.on("leave_meeting", ({username, meetingCode}) => {
 
     socket.leave(meetingCode)
